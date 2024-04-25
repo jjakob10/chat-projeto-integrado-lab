@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat</title>
+  <script>
+    function enviarMensagem() {
+      let remetente = document.getElementById('remetente').value;
+      let mensagem = document.getElementById('mensagem').value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "http://localhost:8080/chat", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          atualizarChat();
+        }
+      };
+      var data = JSON.stringify({ "remetente": remetente, "mensagem": mensagem });
+      xhr.send(data);
+    }
+
+    function atualizarChat() {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "http://localhost:8080/chat", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var json = JSON.parse(xhr.response);
+          var chat = "";
+          for (var i = 0; i < json.length; i++) {
+            chat += `[${json[i].horario}] ${json[i].remetente}: ${json[i].mensagem}<br />`;
+          }
+          document.getElementById('chat').innerHTML = chat;
+        }
+      };
+      xhr.send();
+    }
+  </script>
+</head>
+
+<body>
+  <h1>Enviar</h1>
+  <p>Remetente: <input id="remetente" type="text" /></p>
+  <p>Mensagem: <input id="mensagem" type="text" /></p>
+  <button type="button" onclick="enviarMensagem()">
+    Enviar!
+  </button>
+
+  <hr />
+
+  <h1>Chat</h1>
+
+  <button type="button" onclick="atualizarChat()">
+    Atualizar!
+  </button>
+
+  <div id="chat"></div>
+</body>
+
+</html>
